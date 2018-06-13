@@ -2,6 +2,7 @@ package com.steffen.presentationModel;
 
 import com.steffen.presentationModel.domain.DataSourceAlbum;
 import com.steffen.presentationModel.pModel.PModelAlbum;
+import com.steffen.presentationModel.views.AlbumDialog;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
 
 
-        DataSourceAlbum dataSourceAlbum = new DataSourceAlbum();
+        /*DataSourceAlbum dataSourceAlbum = new DataSourceAlbum();
         List<DataSourceAlbum> albumList = dataSourceAlbum.getAlbumDataSet();
 
         PModelAlbum pModel = new PModelAlbum(albumList);
@@ -23,7 +24,16 @@ public class Main {
                             pModel.getSelectedArtist() + "\n" +
                             pModel.getWindowTitle() + "\n" +
                             pModel.getAlbumList()[pModel.getSelectedArtist()]
-                            );
+                            );*/
+
+        DataSourceAlbum dataSourceAlbum = new DataSourceAlbum();
+        List<DataSourceAlbum> albumList =  dataSourceAlbum.getAlbumDataSet();
+
+        PModelAlbum pModelAlbum = new PModelAlbum(albumList);
+
+        AlbumDialog albumDialog = new AlbumDialog(pModelAlbum);
+        albumDialog.createView();
+
 
 
 
