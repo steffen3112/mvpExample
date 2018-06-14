@@ -27,9 +27,8 @@ public class Main {
                             );*/
 
         DataSourceAlbum dataSourceAlbum = new DataSourceAlbum();
-        List<DataSourceAlbum> albumList =  dataSourceAlbum.getAlbumDataSet();
 
-        PModelAlbum pModelAlbum = new PModelAlbum(albumList);
+        PModelAlbum pModelAlbum = new PModelAlbum(dataSourceAlbum);
 
         AlbumDialog albumDialog = new AlbumDialog(pModelAlbum);
         albumDialog.createView();

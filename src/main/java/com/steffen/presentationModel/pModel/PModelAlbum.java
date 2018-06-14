@@ -9,14 +9,16 @@ public class PModelAlbum {
     // ~Instance fields
     // ---------------------------------------------------------------------------------------------
 
+    private DataSourceAlbum dataSourceAlbum;
     private List<DataSourceAlbum> dataSourceAlbums;
     private int selectedArtist;
 
     // ~Constructors
     // ---------------------------------------------------------------------------------------------
 
-    public PModelAlbum(List<DataSourceAlbum> dataSourceAlbums) {
-        this.dataSourceAlbums = dataSourceAlbums;
+    public PModelAlbum(DataSourceAlbum dataSourceAlbums) {
+        this.dataSourceAlbum = dataSourceAlbums;
+        this.dataSourceAlbums = dataSourceAlbum.getAlbumDataSet();
         selectedArtist = 0;
     }
 
@@ -66,6 +68,10 @@ public class PModelAlbum {
         return hasRowChanged();
     }
 
+    public List<DataSourceAlbum> getDataSourceAlbums() {
+        return dataSourceAlbums;
+    }
+
     //TODO: Check if the row has changed
     public boolean hasRowChanged() {
         return false;
@@ -87,6 +93,13 @@ public class PModelAlbum {
         this.selectedArtist = selectedArtist;
     }
 
+
+    // ~Setters
+    // ---------------------------------------------------------------------------------------------
+
+    public DataSourceAlbum queryDataSource(String id) {
+        return dataSourceAlbum.queryDataSource(id);
+    }
 
 
 }

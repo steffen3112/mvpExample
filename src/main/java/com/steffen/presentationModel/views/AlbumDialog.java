@@ -1,5 +1,6 @@
 package com.steffen.presentationModel.views;
 
+import com.steffen.presentationModel.domain.DataSourceAlbum;
 import com.steffen.presentationModel.pModel.PModelAlbum;
 
 import javax.swing.*;
@@ -7,6 +8,8 @@ import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AlbumDialog {
 
@@ -14,21 +17,19 @@ public class AlbumDialog {
     // ~Instance fields
     // ---------------------------------------------------------------------------------------------
     private boolean isLoadingView = false;
-    //TODO: refactor instance fields
     PModelAlbum pModelAlbum;
     JScrollPane leftPanel;
     JPanel rightPanel;
     JFrame viewFrame;
-    JButton jButton;
     JSplitPane splitPane;
     JComboBox jComboBoxAlbums;
     JTable table;
-    JTextField textFieldArtist;
-    JTextField textFieldTitle;
+    JTextField textFieldArtist, textFieldTitle, textFieldComposer;
     JCheckBox checkBoxClassical;
-    JTextField textFieldComposer;
-    JButton buttonApply;
-    JButton buttonCancel;
+    JButton buttonApply, buttonCancel, jButton;
+    List<String> artists = new ArrayList<String>();
+    List<Integer> id = new ArrayList<Integer>();
+    List<String[]> values = new ArrayList<String[]>();
 
 
 
@@ -62,17 +63,20 @@ public class AlbumDialog {
         viewFrame = new JFrame("Anzeige");
 
         //TODO: Load data from Presentation Model in JTable
-        final Object rows[][] = { {"111111111111111111111111111111111111111"}, {2}, {3}, {4} };
-        final Object headers[] = { "Artist" };
-        table = new JTable( rows, headers);
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int row = table.rowAtPoint(e.getPoint());
-                int col = table.columnAtPoint(e.getPoint());
-                System.out.println(row + " : " + col);
-            }
-        });
+        List<DataSourceAlbum> dataSourceAlbumList = pModelAlbum.getDataSourceAlbums();
+        for(DataSourceAlbum album : dataSourceAlbumList) {
+            artists.add(album.getArtist());
+            id.add(album.getId());
+        }
+
+        for(int i = 0; i<id.size(); i++) {
+            values.add(new String[]{String.valueOf(id.get(i)), artists.get(i)});
+        }
+
+
+        final Object headers[] = { "#" , "Artist" };
+        table = new JTable(values.toArray(new Object[][] {}), headers);
+
 
         leftPanel = new JScrollPane(table);
         leftPanel.setBackground(Color.GRAY);
@@ -88,9 +92,9 @@ public class AlbumDialog {
 
         rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setBackground(Color.LIGHT_GRAY);
-        textFieldArtist = new JTextField("Killa");
-        textFieldTitle = new JTextField("Lemonade and Buns");
-        checkBoxClassical = new JCheckBox("classical", false);
+        textFieldArtist = new JTextField("default artist");
+        textFieldTitle = new JTextField("default title");
+        checkBoxClassical = new JCheckBox("classical", isLoadingView);
         textFieldComposer = new JTextField("ggg");
         textFieldComposer.setEnabled(false);
         buttonApply = new JButton("Apply");
@@ -112,6 +116,7 @@ public class AlbumDialog {
         viewFrame.setSize(new Dimension(800,500));
         viewFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         //createViewElements();
+        loadFromPmod();
         viewFrame.setVisible(true);
     }
 
@@ -129,6 +134,30 @@ public class AlbumDialog {
 
     private void loadFromPmod() {
         //TODO: write function which retrieves the necessary data from the Presentation Model
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                System.out.println(row + " : " + col + "data: " + table.getValueAt(row,col));
+                int selectedRow = table.getSelectedRow();
+                String id = (String) table.getValueAt(selectedRow, 0);
+                DataSourceAlbum album = pModelAlbum.queryDataSource(id);
+
+                String newArtist = album.getArtist();
+                String newTitle = album.getTitle();
+                String newComposer = album.getComposer();
+                boolean newClassical = album.isClassical();
+
+                textFieldArtist.setText(newArtist);
+                textFieldTitle.setText(newTitle);
+                textFieldComposer.setText(newComposer);
+                checkBoxClassical.setSelected(newClassical);
+                System.out.println(album.toString());
+
+            }
+        });
+
     }
 
     private void syncWithPmod() {

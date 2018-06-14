@@ -12,6 +12,7 @@ public class DataSourceAlbum {
     String title;
     boolean classical;
     String composer;
+    List<DataSourceAlbum> albumList;
 
     // ~Constructors
     // ---------------------------------------------------------------------------------------------
@@ -67,7 +68,7 @@ public class DataSourceAlbum {
     // ---------------------------------------------------------------------------------------------
 
     public List<DataSourceAlbum> getAlbumDataSet() {
-        List<DataSourceAlbum> albumList = new ArrayList<DataSourceAlbum>();
+        albumList = new ArrayList<DataSourceAlbum>();
 
         DataSourceAlbum album1 = new DataSourceAlbum(1, "Ärzte", "Junge" , false, null);
         DataSourceAlbum album2 = new DataSourceAlbum(2, "Hosen", "Tote Hose" ,false, null);
@@ -82,5 +83,18 @@ public class DataSourceAlbum {
         albumList.add(album5);
 
         return albumList;
+    }
+
+    public DataSourceAlbum queryDataSource(String id) {
+
+
+        try {
+            int givenId = Integer.parseInt(id);
+            return albumList.get(givenId-1);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
