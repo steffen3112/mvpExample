@@ -94,11 +94,25 @@ public class PModelAlbum {
     }
 
 
-    // ~Setters
+    // ~Methods
     // ---------------------------------------------------------------------------------------------
 
     public DataSourceAlbum queryDataSource(String id) {
         return dataSourceAlbum.queryDataSource(id);
+    }
+
+    /**
+     *
+     * @param newArtist
+     * @param newTitle
+     * @param newClassical
+     * @param newComposer
+     */
+    public void updateModel(String newArtist, String newTitle, boolean newClassical, String newComposer) {
+        dataSourceAlbums.get(selectedArtist).setArtist(newArtist);
+        dataSourceAlbums.get(selectedArtist).setTitle(newTitle);
+        dataSourceAlbums.get(selectedArtist).setClassical(newClassical);
+        dataSourceAlbums.get(selectedArtist).setComposer(newComposer);
     }
 
 

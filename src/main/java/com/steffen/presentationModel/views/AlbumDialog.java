@@ -6,8 +6,7 @@ import com.steffen.presentationModel.pModel.PModelAlbum;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,19 +16,16 @@ public class AlbumDialog {
     // ~Instance fields
     // ---------------------------------------------------------------------------------------------
     private boolean isLoadingView = false;
-    PModelAlbum pModelAlbum;
-    JScrollPane leftPanel;
-    JPanel rightPanel;
-    JFrame viewFrame;
-    JSplitPane splitPane;
-    JComboBox jComboBoxAlbums;
-    JTable table;
-    JTextField textFieldArtist, textFieldTitle, textFieldComposer;
-    JCheckBox checkBoxClassical;
-    JButton buttonApply, buttonCancel, jButton;
-    List<String> artists = new ArrayList<String>();
-    List<Integer> id = new ArrayList<Integer>();
-    List<String[]> values = new ArrayList<String[]>();
+    private PModelAlbum pModelAlbum;
+    private JFrame viewFrame;
+    private JComboBox jComboBoxAlbums;
+    private JTable table;
+    private JTextField textFieldArtist, textFieldTitle, textFieldComposer;
+    private JCheckBox checkBoxClassical;
+    private List<String> artists = new ArrayList<String>();
+    private List<Integer> id = new ArrayList<Integer>();
+    private List<String[]> values = new ArrayList<String[]>();
+    private JButton buttonApply, buttonCancel, buttonAddAlbum;
 
 
 
@@ -44,7 +40,7 @@ public class AlbumDialog {
     // ---------------------------------------------------------------------------------------------
 
     public boolean isLoadingView() {
-        return !isLoadingView;
+        return isLoadingView;
     }
 
     // ~Setters
@@ -78,7 +74,7 @@ public class AlbumDialog {
         table = new JTable(values.toArray(new Object[][] {}), headers);
 
 
-        leftPanel = new JScrollPane(table);
+        JScrollPane leftPanel = new JScrollPane(table);
         leftPanel.setBackground(Color.GRAY);
         leftPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
@@ -90,15 +86,64 @@ public class AlbumDialog {
         firstCol.fill = GridBagConstraints.HORIZONTAL;
         firstCol.insets = new Insets(5,20,5,5);
 
-        rightPanel = new JPanel(new GridBagLayout());
+        JPanel rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setBackground(Color.LIGHT_GRAY);
         textFieldArtist = new JTextField("default artist");
-        textFieldTitle = new JTextField("default title");
-        checkBoxClassical = new JCheckBox("classical", isLoadingView);
-        textFieldComposer = new JTextField("ggg");
+        textFieldComposer = new JTextField(pModelAlbum.getComposer());
         textFieldComposer.setEnabled(false);
+        textFieldComposer = new JTextField("ggg");
+        textFieldArtist.addKeyListener(new KeyListener() {
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            public void keyPressed(KeyEvent e) {
+                if(!textFieldComposer.isEnabled())
+                    textFieldComposer.setEnabled(true);
+            }
+
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
+        textFieldTitle = new JTextField("default title");
+        textFieldTitle.addKeyListener(new KeyListener() {
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            public void keyPressed(KeyEvent e) {
+                if(!textFieldComposer.isEnabled())
+                    textFieldComposer.setEnabled(true);
+            }
+
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
+        checkBoxClassical = new JCheckBox("classical", isLoadingView);
         buttonApply = new JButton("Apply");
+        buttonApply.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Apply Changed");
+                syncWithPmod();
+            }
+        });
         buttonCancel = new JButton("Cancel");
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textFieldArtist.setText(pModelAlbum.getArtist());
+                textFieldComposer.setText(pModelAlbum.getComposer());
+                textFieldTitle.setText(pModelAlbum.getTitle());
+                checkBoxClassical.setSelected(pModelAlbum.isClassical());
+            }
+        });
+        buttonAddAlbum = new JButton("Add new Album");
+        buttonAddAlbum.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         rightPanel.add(textFieldArtist, firstCol);
         rightPanel.add(textFieldTitle, firstCol);
         rightPanel.add(checkBoxClassical, firstCol);
@@ -106,7 +151,7 @@ public class AlbumDialog {
         rightPanel.add(buttonApply, firstCol);
         rightPanel.add(buttonCancel, firstCol);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
 
         splitPane.setDividerLocation(300);
 
@@ -123,45 +168,63 @@ public class AlbumDialog {
     private void createViewElements() {
 
         JFrame.setDefaultLookAndFeelDecorated(true);
-        jButton = new JButton("push");
+        JButton jButton = new JButton("push");
         viewFrame.add(jButton);
 
     }
 
     private void saveToPmod() {
-        //TODO: write function which saves the changed view fields to the Presentation Model
+        String newArtist = textFieldArtist.getText();
+        String newTitle = textFieldTitle.getText();
+        boolean newClassical = checkBoxClassical.isSelected();
+        String newComposer = textFieldComposer.getText();
+
+        pModelAlbum.updateModel(newArtist, newTitle, newClassical, newComposer);
+
+
     }
 
     private void loadFromPmod() {
-        //TODO: write function which retrieves the necessary data from the Presentation Model
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int row = table.rowAtPoint(e.getPoint());
-                int col = table.columnAtPoint(e.getPoint());
-                System.out.println(row + " : " + col + "data: " + table.getValueAt(row,col));
-                int selectedRow = table.getSelectedRow();
-                String id = (String) table.getValueAt(selectedRow, 0);
-                DataSourceAlbum album = pModelAlbum.queryDataSource(id);
 
-                String newArtist = album.getArtist();
-                String newTitle = album.getTitle();
-                String newComposer = album.getComposer();
-                boolean newClassical = album.isClassical();
+        if(!isLoadingView()) {
 
-                textFieldArtist.setText(newArtist);
-                textFieldTitle.setText(newTitle);
-                textFieldComposer.setText(newComposer);
-                checkBoxClassical.setSelected(newClassical);
-                System.out.println(album.toString());
+            table.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int row = table.rowAtPoint(e.getPoint());
+                    int col = table.columnAtPoint(e.getPoint());
+                    System.out.println(row + " : " + col + "data: " + table.getValueAt(row,col));
+                    int selectedRow = table.getSelectedRow();
+                    String id = (String) table.getValueAt(selectedRow, 0);
 
-            }
-        });
+                    //DataSourceAlbum album = pModelAlbum.queryDataSource(id);
+
+                    pModelAlbum.setSelectedArtist(Integer.parseInt(id)-1);
+                    System.out.println("SELECTED ARTIST " + pModelAlbum.getSelectedArtist());
+                    String newArtist = pModelAlbum.getArtist();
+                    String newTitle = pModelAlbum.getTitle();
+                    String newComposer = pModelAlbum.getComposer();
+                    boolean newClassical = pModelAlbum.isClassical();
+
+                    textFieldArtist.setText(newArtist);
+                    textFieldTitle.setText(newTitle);
+                    textFieldComposer.setText(newComposer);
+                    textFieldComposer.setEnabled(pModelAlbum.isComposerFieldEnabled());
+                    checkBoxClassical.setSelected(newClassical);
+                    System.out.println(pModelAlbum.toString());
+
+                }
+            });
+            isLoadingView = true;
+        }
+        else return;
 
     }
 
+
+
     private void syncWithPmod() {
-        if(isLoadingView) {
+        if(isLoadingView()) {
             saveToPmod();
             loadFromPmod();
         }
